@@ -9,11 +9,15 @@ public class SkierMovement : MonoBehaviour
 {
 
     public float thrust = 10f;
+    
     public float rotationSpeed = 3f;
     
     private Rigidbody _rigidbody;
+    
     private BoxCollider _boxCollider;
+    
     private Vector3 _movementForce;
+    
     private Vector3 _rotateForce;
     
     void Awake()
