@@ -10,15 +10,10 @@ using Vector3 = UnityEngine.Vector3;
 
 public class SkierAi : MonoBehaviour
 {
-    /**
-    * <summary>The different targets located at the bottom of the track</summary>
-    */
-    public Transform[] targets;
-    
     public float rotationSpeed;
     
     public float verticalSpeed;
-    
+
     /**
     * <summary>The distance at which the skier begins to see an obstacle or another skier</summary>
     */
@@ -54,7 +49,7 @@ public class SkierAi : MonoBehaviour
     /**
     * <summary>The chosen target</summary>
     */
-    private Transform _target;
+    public Transform _target;
     
     public void Awake()
     {
@@ -64,36 +59,26 @@ public class SkierAi : MonoBehaviour
     public void Start()
     {
         _directions = MakeRayDirections();
-        _target = targets[0];
     }
-
+    
     public void FixedUpdate()
     {
-        _position = transform.position;
-
-        for (int i = 0; i < targets.Length; i++)
-        {
-            if (Vector3.Distance(_target.position, _position) > Vector3.Distance(targets[i].position, _position))
-            {
-                _target = targets[i];
-            }
-        }
-        
         _desiredDirection = (_target.position - _position).normalized;
-        _lookRotation = Quaternion.LookRotation(_desiredDirection);
-        transform.rotation = Quaternion.Slerp(transform.rotation, _lookRotation, Time.deltaTime * rotationSpeed);
+        
+        _position = transform.position;
+        
         
         for (int i = 0; i < _directions.Length; i++) {
-            Debug.DrawRay(_position, _directions[i] * distanceOfView, Color.red);
             Vector3 dir = transform.TransformDirection (_directions[i]);
             Ray ray = new Ray (_position, dir);
-            if (Physics.SphereCast (ray, 0.27f, distanceOfView, LayerMask.GetMask("Obstacle")))
+            if (Physics.Raycast(ray, distanceOfView, LayerMask.GetMask("Obstacle")))
             {
-                Vector3 avoidDirection = -dir.normalized;
-                _lookRotation = Quaternion.LookRotation(avoidDirection);
-                transform.rotation = Quaternion.Slerp(transform.rotation, _lookRotation, Time.deltaTime * rotationSpeed);
+                _desiredDirection = -dir.normalized;
             }
         }
+        
+        _lookRotation = Quaternion.LookRotation(_desiredDirection);
+        transform.rotation = Quaternion.Slerp(transform.rotation, _lookRotation, Time.deltaTime * rotationSpeed);
         
         if (Vector3.Distance(_target.position, _position) > distanceOfTargetValidation)
         {
@@ -106,20 +91,17 @@ public class SkierAi : MonoBehaviour
      */
     private Vector3[] MakeRayDirections()
     {
-        const int numViewDirections = 300;
-        Vector3[] directions = new Vector3[300];
-        
-        float goldenRatio = (1 + Mathf.Sqrt (5)) / 2;
-        float angleIncrement = Mathf.PI * 2 * goldenRatio;
+        const int numViewDirections = 90;
+        Vector3[] directions = new Vector3[numViewDirections];
+
 
         for (int i = 0; i < numViewDirections; i++) {
-            float t = (float) i / numViewDirections;
-            float inclination = Mathf.Acos (1 - 2 * t);
-            float azimuth = angleIncrement * i;
-
-            float x = Mathf.Sin (inclination) * Mathf.Cos (azimuth);
-            float y = Mathf.Sin (inclination) * Mathf.Sin (azimuth);
-            float z = Mathf.Cos (inclination);
+            float angleIncrement = Mathf.PI * i / numViewDirections;
+            
+            float x = Mathf.Cos (angleIncrement);
+            float y = 0;
+            float z = Mathf.Sin (angleIncrement);
+            
             directions[i] = new Vector3 (x, y, z);
         }
         return directions;

@@ -8,8 +8,10 @@
 
 ### Jouer à l'application
 
-De nombreuses fonctionnalités demandées n'ont pas été implémentées. Vous pouvez simplement descendre la pente avec les touches : 
+Vous devez aller au deux piquets rouge dans le minimum de temps possible : 
 - W pour accélérer
 - S pour ralentir
 - A pour tourner vers la gauche
 - D pour tourner vers la droite
+
+Vous devez éviter les obstacles sur votre descente (Arbres, Skieur)
